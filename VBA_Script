@@ -1,0 +1,185 @@
+Attribute VB_Name = "Module1"
+Sub Multiple_Year_Stock_Data():
+
+Dim ws As Worksheet
+
+For Each ws In Worksheets
+
+ws.Cells(1, 9).Value = "Ticker"
+ws.Cells(1, 10).Value = "Yearly Change"
+ws.Cells(1, 11).Value = "Percent Change"
+ws.Cells(1, 12).Value = "Total Stock Volume"
+
+Dim ticker_symbol As String
+
+Dim total_volume As Double
+total_volume = 0
+
+Dim rowcount As Long
+rowcount = 2
+
+Dim year_open As Double
+year_open = 0
+
+Dim year_close As Double
+year_close = 0
+
+Dim yearly_change As Double
+yearly_change = 0
+
+Dim percent_change As Double
+percent_change = 0
+
+Dim lastrow As Long
+lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+For i = 2 To lastrow
+
+If ws.Cells(i, 1).Value <> ws.Cells(i - 1, 1).Value Then
+
+year_open = ws.Cells(i, 3).Value
+
+End If
+
+total_volume = total_volume + ws.Cells(i, 7)
+
+If ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value Then
+
+ws.Cells(rowcount, 9).Value = ws.Cells(i, 1).Value
+
+ws.Cells(rowcount, 12).Value = total_volume
+
+year_close = ws.Cells(i, 6).Value
+
+yearly_change = year_close - year_open
+ws.Cells(rowcount, 10).Value = yearly_change
+
+If yearly_change >= 0 Then
+ws.Cells(rowcount, 10).Interior.ColorIndex = 4
+
+Else
+ws.Cells(rowcount, 10).Interior.ColorIndex = 3
+
+End If
+
+If year_open = 0 And year_close = 0 Then
+
+percent_change = 0
+
+ws.Cells(rowcount, 11).Value = percent_change
+
+ws.Cells(rowcount, 11).NumberFormat = "0.00%"
+
+ElseIf year_open = 0 Then
+
+Dim percent_change_NAN As String
+
+percent_change_NAN = "NAN"
+
+ws.Cells(rowcount, 11).Value = percent_change
+
+Else
+
+percent_change = yearly_change / year_open
+
+ws.Cells(rowcount, 11).Value = percent_change
+
+ws.Cells(rowcount, 11).NumberFormat = "0.00%"
+
+End If
+
+rowcount = rowcount + 1
+
+
+total_volume = 0
+
+year_open = 0
+
+year_close = 0
+
+yearly_change = 0
+
+percent_change = 0
+
+End If
+
+Next i
+
+ws.Cells(1, 16).Value = "Ticker"
+
+ws.Cells(1, 17).Value = "Value"
+
+ws.Cells(2, 15).Value = "Greatest % Increase"
+
+ws.Cells(3, 15).Value = "Greatest % Decrease"
+
+ws.Cells(4, 15).Value = "Greatest Total Volume"
+
+lastrow = ws.Cells(Rows.Count, 9).End(xlUp).Row
+
+Dim greatest_stock As String
+
+Dim greatest_value As Double
+greatest_value = ws.Cells(2, 11).Value
+
+Dim lowest_stock As String
+
+Dim lowest_value As Double
+lowest_value = ws.Cells(2, 11).Value
+
+Dim greatest_volume_stock As String
+
+Dim greatest_volume_value As Double
+greatest_volume_value = ws.Cells(2, 12).Value
+
+For j = 2 To lastrow
+
+If ws.Cells(j, 11).Value > greatest_value Then
+
+greatest_value = ws.Cells(j, 11).Value
+
+greatest_stock = ws.Cells(j, 9).Value
+
+End If
+
+If ws.Cells(j, 11).Value < lowest_value Then
+
+lowest_value = ws.Cells(j, 11).Value
+
+lowest_stock = ws.Cells(j, 9).Value
+
+End If
+
+If ws.Cells(j, 12).Value > greatest_volume_value Then
+
+greatest_volume_value = ws.Cells(j, 12).Value
+
+greatest_volume_stock = ws.Cells(j, 9).Value
+
+End If
+
+Next j
+
+ws.Cells(2, 16).Value = greatest_stock
+
+ws.Cells(2, 17).Value = greatest_value
+
+ws.Cells(2, 17).NumberFormat = "0.00%"
+
+ws.Cells(3, 16).Value = lowest_stock
+
+ws.Cells(3, 17).Value = lowest_value
+
+ws.Cells(3, 17).NumberFormat = "0.00%"
+
+ws.Cells(4, 16).Value = greatest_volume_stock
+
+ws.Cells(4, 17).Value = greatest_volume_value
+
+ws.Columns("I:L").EntireColumn.AutoFit
+
+ws.Columns("O:Q").EntireColumn.AutoFit
+
+Next ws
+
+End Sub
